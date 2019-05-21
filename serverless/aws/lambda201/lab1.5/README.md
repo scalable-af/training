@@ -206,13 +206,17 @@ We are going to add dynamic functionality to our static site using Lambda functi
         --zip-file fileb://function.zip --handler comments.post --runtime python3.7 \
         --role arn:aws:iam::{AWS_ACCOUNT_ID}:role/{EXECUTION_ROLE_FROM_LAB1.2}
         ```
-    - `studentID-comments-post` to return all the comments matching our page for `github-webhook` to compile the comments into the static files.
+
+    - `studentID-comments-get` to return all the comments matching our page for `github-webhook` to compile the comments into the static files.
+
         ```bash
         aws lambda create-function --function-name {FUNCTION_NAME - ex. student00-comments-get} \
         --zip-file fileb://function.zip --handler comments.get --runtime python3.7 \
         --role arn:aws:iam::{AWS_ACCOUNT_ID}:role/{EXECUTION_ROLE_FROM_LAB1.2}
         ```
+
     - `studentID-dynamo-stream` to be triggered any time changes are made to the DynamoDB, calling the github-webhook with a mocked payload to trigger a rebuild of the static content. This way our comments are updated automatically without us having to do anything. Even if we go in the table and manually remove/moderate them.
+
         ```bash
         aws lambda create-function --function-name {FUNCTION_NAME - ex. student00-dynamo-stream} \
         --zip-file fileb://function.zip --handler dynamo_stream.fake_webhook --runtime python3.7 \
@@ -220,11 +224,12 @@ We are going to add dynamic functionality to our static site using Lambda functi
         ```
 
 3. Create an `API Gateway` for our `studentID-comments-post` function
-    - You can create an `API Gateway` via the CLI but it is a long drawn out process that we will simply using the SAM/Serverless frameworks tomorrow. For simple services and applications using the UI works well. Create an `API Gateway` for your `studentID-comments-post` function similar to what you did in lab 1.3 when setting up the initial webhook.
+    - You can create an `API Gateway` via the CLI, but it is a long drawn out process that we will simply be using the SAM/Serverless frameworks for tomorrow. For simple services and applications, using the UI works well. Create an `API Gateway` for your `studentID-comments-post` function similar to what you did in lab 1.3 when setting up the initial webhook.
 
 4. Configure the blog to submit comments to our function
     - Copy the `API Endpoint` and put it in the `config.toml` file in the root directory of your blog. Replace the following line
-        ``` 
+
+        ```toml
         [params.lambdaComments]
         endpoint = "http://the-url-to-our-lambda-API-Gateway"
         ```
@@ -263,6 +268,7 @@ We are going to add dynamic functionality to our static site using Lambda functi
             }
         }
         ```
+
 6. Add our table name to both of our comments functions
     - Set our table name environment variable in both of your `comments` Lambda functions  
         *Note in the below, because we use the {YOUR_VARIABLE} syntax for what needs to be replaced there is two `}}` at the end of the line, but when you put in your name it should look like `"Variables={table_name=student00-comments}" `*  
@@ -276,6 +282,7 @@ We are going to add dynamic functionality to our static site using Lambda functi
         ```sh
         aws lambda update-function-configuration --function-name {FUNCTION_NAME - ex. student00-comments-post} --environment "Variables={table_name={YOUR_TABLE_NAME - e.g. student00-comments}}" 
         ```
+
 7. Add all of the environment variables needed to connect our `dynamo-stream` and `github-webhook` functions together
     - We need to add the `webhook_function` environment variable in our `dynamo-stream` function as we saw in the code review earlier, we also need to set the `comment_function` (specifically the function matching the get as this is howe we will read in the comments) environment variable for our `github-webhook` function so they can reference each-other appropriately.  
       
@@ -283,11 +290,11 @@ We are going to add dynamic functionality to our static site using Lambda functi
         We also need to add the `full_name` and `clone_url` environment variables to our `dynamo-stream` function. The content for these can be found in the `github-webhook` logs from lab 1.3. Look in the CloudWatch stream for the messages we saved. The `clone_url` will look something like `https://github.com/scalable-af/training.git` and the `full_name` similar to `scalable-af/training`
 
         ```sh
-        aws lambda update-function-configuration --function-name {FUNCTION_NAME - ex. student00-dynamo-stream} --environment "Variables={webhook_function={YOUR_TABLE_NAME - e.g. student00-github-webhook},full_name={YOUR_REPO_FULL_NAME},clone_url={YOUR_CLONE_URL}}" 
+        aws lambda update-function-configuration --function-name {FUNCTION_NAME - ex. student00-dynamo-stream} --environment "Variables={webhook_function={YOUR_WEBHOOK_FUNCTION - e.g. student00-github-webhook},full_name={YOUR_REPO_FULL_NAME},clone_url={YOUR_CLONE_URL}}"
         ```
 
         ```sh
-        aws lambda update-function-configuration --function-name {FUNCTION_NAME - ex. student00-github-webhook} --environment "Variables={comment_function={YOUR_TABLE_NAME - e.g. student00-comments-get}}" 
+        aws lambda update-function-configuration --function-name {FUNCTION_NAME - ex. student00-github-webhook} --environment "Variables={comment_function={YOUR_COMMENTS_FUNCTION - e.g. student00-comments-get}}"
         ```
 
 8. Update our `github-webhook` code to enable the `add_comments` feature.
@@ -334,7 +341,7 @@ We are going to add dynamic functionality to our static site using Lambda functi
                     "dynamodb:*",
                     "lambda:*",
                     "logs:*",
-                    "s3:*",
+                    "s3:*"
                 ],
                 "Resource": "*"
             }

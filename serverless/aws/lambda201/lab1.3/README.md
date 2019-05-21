@@ -145,7 +145,7 @@ We will begin creating the building blocks of our static site that will be autom
 
     *Use the Execution role that we created in lab 1.2, we will be adding to this role throughout the rest of the course.*
 
-    Zip up the function in `webhook.py` that you can find in [/lab1.3/source/](./lab1.3/source/).
+    Zip up the function in `webhook.py` that you can find in [/lab1.3/source/](./source/).
 
     ```bash
     zip -r function.zip .
