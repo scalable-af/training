@@ -29,7 +29,7 @@
     Make sure you are in the folder where you want your code and template file to be created before running this command. It will create a `sam-app` folder wherever it is ran.
     - Initialize a `python 3.7` function and template
         ```sh
-        sam init --runtime python3.7
+        sam init --runtime python3.6
         ```
         you should see something similar to
         ```sh

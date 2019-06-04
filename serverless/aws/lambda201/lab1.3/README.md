@@ -155,7 +155,7 @@ We will begin creating the building blocks of our static site that will be autom
 
     ```bash
     aws lambda create-function --function-name {FUNCTION_NAME - ex. student00-github-webhook} \
-    --zip-file fileb://function.zip --handler webhook.post --runtime python3.7 \
+    --zip-file fileb://function.zip --handler webhook.post --runtime python3.6 \
     --role arn:aws:iam::{AWS_ACCOUNT_ID}:role/{EXECUTION_ROLE_FROM_LAB1.2}
     ```
 
@@ -177,7 +177,7 @@ We will begin creating the building blocks of our static site that will be autom
         "Timeout": 3, 
         "LastModified": "2019-05-12T12:22:51.690+0000", 
         "Handler": "webhook.post", 
-        "Runtime": "python3.7", 
+        "Runtime": "python3.6", 
         "Description": ""
     }
     ```

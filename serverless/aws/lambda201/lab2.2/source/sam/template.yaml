@@ -28,7 +28,7 @@ Resources:
         - !Ref Student00AWSCLILayer
         - !Ref Student00LibCLayer
         - !Ref Student00HugoLayer
-      Runtime: python3.7
+      Runtime: python3.6
       Environment:
         Variables:
           output_bucket:
@@ -49,7 +49,7 @@ Resources:
       Description: AWS CLI Layer
       ContentUri: layers/lambda-layer-awscli-1.16.115.zip
       CompatibleRuntimes:
-        - python3.7
+        - python3.6
       LicenseInfo: 'MIT'
       RetentionPolicy: Retain
   Student00LibCLayer:
@@ -59,7 +59,7 @@ Resources:
       Description: LIBC Layer
       ContentUri: layers/lambda-layer-libstdc.zip
       CompatibleRuntimes:
-        - python3.7
+        - python3.6
       LicenseInfo: 'MIT'
       RetentionPolicy: Retain
   Student00HugoLayer:
@@ -69,7 +69,7 @@ Resources:
       Description: Hugo CLI Layer
       ContentUri: layers/lambda-layer-hugo-0.54.zip
       CompatibleRuntimes:
-        - python3.7
+        - python3.6
       LicenseInfo: 'MIT'
       RetentionPolicy: Retain
   Student00CommentsPostSAM:
@@ -88,7 +88,7 @@ Resources:
             Resource: '*'
       CodeUri: comments/
       Handler: comments.post
-      Runtime: python3.7
+      Runtime: python3.6
       Environment:
         Variables:
           table_name:
@@ -120,7 +120,7 @@ Resources:
             Resource: '*'
       CodeUri: comments/
       Handler: comments.get
-      Runtime: python3.7
+      Runtime: python3.6
       Environment:
         Variables:
           table_name:
@@ -147,7 +147,7 @@ Resources:
             Resource: '*'
       CodeUri: dynamo_stream/
       Handler: dynamo_stream.fake_webhook
-      Runtime: python3.7
+      Runtime: python3.6
       Environment:
         Variables:
           webhook_function:
