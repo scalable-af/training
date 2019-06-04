@@ -1,0 +1,13 @@
+<form id="comment_form">
+        <input type="hidden" id="page" name="page" value="{{ .File.TranslationBaseName }}">
+        <label class="description" for="name">Name </label>
+        <div>
+        <input id="name" name="name" class="element text medium" type="text" maxlength="255" value=""/> 
+        </div> 
+        <label class="description" for="comment">Comment</label>
+        <div>
+        <textarea id="comment" name="comment" class="element textarea medium"></textarea> 
+        </div> 
+        <input id="saveForm" class="Submit" type="submit" name="submit" value="Submit" />
+</form>	
+<div id="form-response"></div>

@@ -1,0 +1,4 @@
+baseURL = ""
+languageCode = "en-us"
+title = "AWS Lambda - Serverless"
+theme = "ananke"

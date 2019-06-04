@@ -1,0 +1,223 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Hugo Static Site
+
+Globals:
+  Function:
+    Timeout: 300
+
+Resources:
+  Student00GithubWebhookSAM:
+    Type: AWS::Serverless::Function
+    Properties:
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - cloudwatch:*
+              - events:*
+              - dynamodb:*
+              - lambda:*
+              - logs:*
+              - s3:*
+            Resource: '*'
+      MemorySize: 256
+      CodeUri: github_webhook/
+      Handler: webhook.post
+      Layers:
+        - !Ref Student00AWSCLILayer
+        - !Ref Student00LibCLayer
+        - !Ref Student00HugoLayer
+      Runtime: python3.7
+      Environment:
+        Variables:
+          output_bucket:
+            !Ref Student00HugoSiteBucket
+          comment_function:
+            !Ref Student00CommentsGetSAM
+          github_secrets: secret
+      Events:
+        WebhookPost:
+          Type: Api
+          Properties:
+            Path: /webhook
+            Method: post
+  Student00AWSCLILayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: student00aws-cli-layer
+      Description: AWS CLI Layer
+      ContentUri: layers/lambda-layer-awscli-1.16.115.zip
+      CompatibleRuntimes:
+        - python3.7
+      LicenseInfo: 'MIT'
+      RetentionPolicy: Retain
+  Student00LibCLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: student00libc-layer
+      Description: LIBC Layer
+      ContentUri: layers/lambda-layer-libstdc.zip
+      CompatibleRuntimes:
+        - python3.7
+      LicenseInfo: 'MIT'
+      RetentionPolicy: Retain
+  Student00HugoLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: student00hugo-layer
+      Description: Hugo CLI Layer
+      ContentUri: layers/lambda-layer-hugo-0.54.zip
+      CompatibleRuntimes:
+        - python3.7
+      LicenseInfo: 'MIT'
+      RetentionPolicy: Retain
+  Student00CommentsPostSAM:
+    Type: AWS::Serverless::Function
+    Properties:
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - cloudwatch:*
+              - events:*
+              - dynamodb:*
+              - lambda:*
+              - logs:*
+              - s3:*
+            Resource: '*'
+      CodeUri: comments/
+      Handler: comments.post
+      Runtime: python3.7
+      Environment:
+        Variables:
+          table_name:
+            !Ref Student00CommentsSAM
+      Events:
+        CommentsPost:
+          Type: Api
+          Properties:
+            Path: /comments
+            Method: post
+        CommentsOptions:
+          Type: Api
+          Properties:
+            Path: /comments
+            Method: options
+  Student00CommentsGetSAM:
+    Type: AWS::Serverless::Function
+    Properties:
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - cloudwatch:*
+              - events:*
+              - dynamodb:*
+              - lambda:*
+              - logs:*
+              - s3:*
+            Resource: '*'
+      CodeUri: comments/
+      Handler: comments.get
+      Runtime: python3.7
+      Environment:
+        Variables:
+          table_name:
+            !Ref Student00CommentsSAM
+      Events:
+        CommentsGet:
+          Type: Api
+          Properties:
+            Path: /comments
+            Method: get
+  Student00DynamoStreamSAM:
+    Type: AWS::Serverless::Function
+    Properties:
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - cloudwatch:*
+              - events:*
+              - dynamodb:*
+              - lambda:*
+              - logs:*
+              - s3:*
+            Resource: '*'
+      CodeUri: dynamo_stream/
+      Handler: dynamo_stream.fake_webhook
+      Runtime: python3.7
+      Environment:
+        Variables:
+          webhook_function:
+            !Ref Student00GithubWebhookSAM
+          full_name: YOUR_REPO_NAME e.g. student00/blog
+          clone_url: YOUR_HTTPS_CLONE_URL e.g. https://github.com/scalable-af/training.git
+      Events:
+        Stream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt Student00CommentsSAM.StreamArn
+            BatchSize: 10
+            StartingPosition: TRIM_HORIZON
+  Student00CommentsSAM:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      ProvisionedThroughput:
+        WriteCapacityUnits: 1
+        ReadCapacityUnits: 1
+      AttributeDefinitions:
+        - AttributeName: uuid
+          AttributeType: S
+      KeySchema:
+        - KeyType: HASH
+          AttributeName: uuid
+  Student00HugoSiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+    DeletionPolicy: Retain
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      PolicyDocument:
+        Id: PublicHostingPolicy
+        Version: 2012-10-17
+        Statement:
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource: !Join 
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref Student00HugoSiteBucket
+                - /*
+      Bucket: !Ref Student00HugoSiteBucket
+
+Outputs:
+  HugoBlogWebhook:
+    Description: "API Gateway endpoint URL for Prod stage for Hugo static site github webhook"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/webhook/"
+  HugoBlogComments:
+    Description: "API Gateway endpoint URL for Prod stage for Hugo static site github webhook"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/comments/"
+  Student00GithubWebhookSAM:
+    Description: "GithubWebhook Lambda Function ARN"
+    Value: !GetAtt Student00GithubWebhookSAM.Arn
+  Student00CommentsPostSAM:
+    Description: "CommentsPost Lambda Function ARN"
+    Value: !GetAtt Student00CommentsPostSAM.Arn
+  Student00CommentsGetSAM:
+    Description: "CommentsGet Lambda Function ARN"
+    Value: !GetAtt Student00CommentsGetSAM.Arn
+  WebsiteURL:
+    Value: !GetAtt 
+      - Student00HugoSiteBucket
+      - WebsiteURL
+    Description: URL for website hosted on S3
