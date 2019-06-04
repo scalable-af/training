@@ -290,7 +290,7 @@ We will use an S3 bucket to host our blog once rendered. For our labs we will us
     This will also have no output if it is successful. If you get an error be sure you replaced the YOUR_BUCKET_NAME with your bucket name in all of the examples.
 
     The HTTP endpoint is always composed of the bucket information  
-    `http://student00-aws-hugo-1s3-website.us-east-2.amazonaws.com`
+    `http://student00-aws-hugo-1.s3-website.us-east-2.amazonaws.com`
     - bucket name
     - `s3-website`
     - region name
