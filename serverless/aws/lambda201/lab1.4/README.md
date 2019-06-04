@@ -227,7 +227,7 @@ You can create layers via the command line, but you have to create them and then
     - Click on the upload button and select the `lambda-layer-awscli-1.16.115.zip` layer.
     - Under `Compatible runtimes` select `Python 3.6` and `Python 3.7`.
         - This is important for the CLI specifically. Hugo is a binary, and would run under any environment, however, the AWS CLI depends on specific versions depending on how it was installed. The layer we are using requires Python 3.6+, since our function code also requires Python 3.6+ for our subprocess command.
-    - Repeate the same processes using appropriate names for the `lambda-layer-hugo-0.54.zip` and `lambda-layer-libstdc.zip` files, creating a total of 3 layers, all associated with the `Python 3.6` and `Python 3.7` runtimes.
+    - Repeat the same processes using appropriate names for the `lambda-layer-hugo-0.54.zip` and `lambda-layer-libstdc.zip` files, creating a total of 3 layers, all associated with the `Python 3.6` and `Python 3.7` runtimes.
 7. Add the layers to our `studentID-github-webhook` function (using your student ID).
     - Go back to the Function editor where we originally configured our __API Gateway__.
     - Below your function name, in the middle of the page, there is a menu item that says 'Layers (0)`. Click on it.
@@ -345,7 +345,7 @@ We will use an S3 bucket to host our blog once rendered. For our labs we will us
     ```sh
     git add .
     git commit -m "lab testing message"
-    git push -u origon
+    git push -u origin
     ```
 
 12. Everything should happen automatically. Check the cloud logs to see what happened. GitHub and the API will likely always show errors due to the execution time, but the CloudWatch logs should show your function completing successfully, and your new site will be post in a few minutes.
