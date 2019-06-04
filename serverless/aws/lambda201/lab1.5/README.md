@@ -314,20 +314,7 @@ We are going to add dynamic functionality to our static site using Lambda functi
         --zip-file fileb://function.zip
         ```
 
-9. Setup our DynamoDB Table to call our `studentID-dynamo-stream` function when entries are added to the table.
-
-    - Unfortunately there is no way currently to setup a DynamoDB stream via the basic CLI so we will have to use the UI to configure our DynamoDB Table to trigger our `studentID-dynamo-stream` function when anything is added to the table.
-    - Go back to the Lambda function editor.
-    - Select your `studentID-dynamo-stream` function.
-    - Similar to how we added an `API Gateway` from the left hand side select `DynamoDB`
-    - It will hae a message saying `Configuration required` click on that.
-    - Now at the bottom there is a `Configure triggers` panel.
-    - Under `DynamoDB table` select the table that you setup for this.  
-        *Since multiple students may be using the same account, be sure to pick your specific table.*
-    - Click `Add` in the lower right hand corner
-    - Click `Save` on you function in the upper right hand corner
-
-10. Add an in-line policy for our execution role so that functions can call other functions within our account.  
+9. Add an in-line policy for our execution role so that functions can call other functions within our account and to ensure we can access the stream.  
 *This is a super open policy, you wouldn't want to use it in production but for testing when adding many new resources it can be useful. Feel free to experiment with making it appropriately restrictive.*
 
     - Put our policy into a JSON file
@@ -354,6 +341,21 @@ We are going to add dynamic functionality to our static site using Lambda functi
     ```sh
     aws iam put-role-policy --role-name {YOUR_CLI_ROLE - e.g. student00-lambda-cli-role} --policy-name FullAccess --policy-document file:///tmp/new-policy.json
     ```
+
+10. Setup our DynamoDB Table to call our `studentID-dynamo-stream` function when entries are added to the table.
+
+    - Unfortunately there is no way currently to setup a DynamoDB stream via the basic CLI so we will have to use the UI to configure our DynamoDB Table to trigger our `studentID-dynamo-stream` function when anything is added to the table.
+    - Go back to the Lambda function editor.
+    - Select your `studentID-dynamo-stream` function.
+    - Similar to how we added an `API Gateway` from the left hand side select `DynamoDB`
+    - It will hae a message saying `Configuration required` click on that.
+    - Now at the bottom there is a `Configure triggers` panel.
+    - Under `DynamoDB table` select the table that you setup for this.  
+        *Since multiple students may be using the same account, be sure to pick your specific table.*
+    - Click `Add` in the lower right hand corner
+    - Click `Save` on you function in the upper right hand corner
+
+
 
 11. Create a comment on your blog and see if the page is automatically rebuilt in a minute or two.
 
