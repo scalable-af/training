@@ -99,7 +99,7 @@ We will begin creating the building blocks of our static site that will be autom
                 }
     ```
 
-    We split the `apikeys` environment variable because we could be re-using this function for multiple API endpoints, multiple repos, etc. It is best practice to have a secret per repo, so even if we use this exact endpoint we can still feed it multiple repos with multiple keys.
+    We split the `github_secrets` environment variable because we could be re-using this function for multiple API endpoints, multiple repos, etc. It is best practice to have a secret per repo, so even if we use this exact endpoint we can still feed it multiple repos with multiple keys.
 
     - We define each key with a `,` to separate them.
     - Compute out the hash and validate the signature.

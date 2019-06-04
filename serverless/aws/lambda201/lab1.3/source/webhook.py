@@ -79,7 +79,6 @@ def post(event, context):
         for k in apikeys:
             computed_hash = hmac.new(k.encode('ascii'), event['body'].encode('ascii'), hashlib.sha1)
             computed_signature = '='.join(['sha1', computed_hash.hexdigest()])
-            hmac.compare_digest(computed_signature.encode('ascii'), signature.encode('ascii'))
             if hmac.compare_digest(computed_signature.encode('ascii'), signature.encode('ascii')):
                 secure = True
     if secure == False:
