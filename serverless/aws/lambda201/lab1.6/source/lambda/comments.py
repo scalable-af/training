@@ -223,8 +223,8 @@ def get(event, context):
     # If we find any comments return with the appropriate status code
     if items:
         return cors_response(modified_items, 200)
-    # If not items are found use the appropriate HTTP code
-    # In our local invokation of this in the webhook we aren't using the status
+    # If no items are found use the appropriate HTTP code
+    # in our local invocation of this in the webhook we aren't using the status
     # code we are counting the items that are returned but if this were being
     # called by a JS handler on the page we would need to use the status code
     # So it makes sense to future proof and return appropriately for both scenarios
