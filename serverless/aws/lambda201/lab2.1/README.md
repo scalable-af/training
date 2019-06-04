@@ -27,7 +27,7 @@
 2. Initialize a hello-world function and template
     - Similar to most other frameworks currently (development and otherwise) you can create a simple boiler plate function and template using the CLI to get you started quickly.
     Make sure you are in the folder where you want your code and template file to be created before running this command. It will create a `sam-app` folder wherever it is ran.
-    - Initialize a `python 3.7` function and template
+    - Initialize a `python 3.6` function and template
         ```sh
         sam init --runtime python3.6
         ```
