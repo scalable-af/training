@@ -23,9 +23,9 @@ Now that we have some functions and applications running in a CloudFormation sta
     ```bash
     2021-01-01 08:38:16 Reading invoke payload from stdin (you can also pass it from file with --event)
     2021-01-01 08:38:16 Found credentials in shared credentials file: ~/.aws/credentials
-    2021-01-01 08:38:16 Invoking comments.get (python3.7)
+    2021-01-01 08:38:16 Invoking comments.get (python3.6)
 
-    Fetching lambci/lambda:python3.7 Docker container image......
+    Fetching lambci/lambda:python3.6 Docker container image......
     2021-01-01 08:38:16 Mounting /training/serverless/aws/lambda201/lab2.2/source/sam/comments as /var/task:ro,delegated inside runtime container
     START RequestId: 52fdfc07-2182-154f-163f-5f0f9a621d72 Version: $LATEST
     [2021-01-01 13:38:17,564][INFO] {'page': 'first-post'}

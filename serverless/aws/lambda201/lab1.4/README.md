@@ -169,7 +169,7 @@ Now that we are getting into more advanced usage, the structure of our `sources`
         "Version": "$LATEST",
         "Role": "arn:aws:iam::1234567890:role/student00-lambda-cli-role",
         "Timeout": 3,
-        "Runtime": "python3.7",
+        "Runtime": "python3.6",
         "TracingConfig": {
             "Mode": "PassThrough"
         },

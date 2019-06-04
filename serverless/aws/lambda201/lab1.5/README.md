@@ -203,7 +203,7 @@ We are going to add dynamic functionality to our static site using Lambda functi
 
         ```bash
         aws lambda create-function --function-name {FUNCTION_NAME - ex. student00-comments-post} \
-        --zip-file fileb://function.zip --handler comments.post --runtime python3.7 \
+        --zip-file fileb://function.zip --handler comments.post --runtime python3.6 \
         --role arn:aws:iam::{AWS_ACCOUNT_ID}:role/{EXECUTION_ROLE_FROM_LAB1.2}
         ```
 
@@ -211,7 +211,7 @@ We are going to add dynamic functionality to our static site using Lambda functi
 
         ```bash
         aws lambda create-function --function-name {FUNCTION_NAME - ex. student00-comments-get} \
-        --zip-file fileb://function.zip --handler comments.get --runtime python3.7 \
+        --zip-file fileb://function.zip --handler comments.get --runtime python3.6 \
         --role arn:aws:iam::{AWS_ACCOUNT_ID}:role/{EXECUTION_ROLE_FROM_LAB1.2}
         ```
 
@@ -219,7 +219,7 @@ We are going to add dynamic functionality to our static site using Lambda functi
 
         ```bash
         aws lambda create-function --function-name {FUNCTION_NAME - ex. student00-dynamo-stream} \
-        --zip-file fileb://function.zip --handler dynamo_stream.fake_webhook --runtime python3.7 \
+        --zip-file fileb://function.zip --handler dynamo_stream.fake_webhook --runtime python3.6 \
         --role arn:aws:iam::{AWS_ACCOUNT_ID}:role/{EXECUTION_ROLE_FROM_LAB1.2}
         ```
 
