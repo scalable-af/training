@@ -209,6 +209,7 @@ We will begin creating the building blocks of our static site that will be autom
     - Under `Which events would you like to trigger this webhook?` You can leave just the push event selected. That is all we really care about for this. More often than not that is what you will use, hence it being the default.
     - Make sure `Active` is selected.
     - Click on **Add Webhook**.
+        ![Github Secrets](./images/github.jpg "Github Secrets")
     - Now that we have our webhook in place, we are ready to do the push that we skipped when creating our repo earlier.
     - From within the folder that you initialized for our blog run:
 
