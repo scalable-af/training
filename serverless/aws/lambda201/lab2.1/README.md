@@ -27,14 +27,14 @@
 2. Initialize a hello-world function and template
     - Similar to most other frameworks currently (development and otherwise) you can create a simple boiler plate function and template using the CLI to get you started quickly.
     Make sure you are in the folder where you want your code and template file to be created before running this command. It will create a `sam-app` folder wherever it is ran.
-    - Initialize a `python 3.6` function and template
+    - Initialize a `python 3.7` function and template
         ```sh
-        sam init --runtime python3.6
+        sam init --runtime python3.7
         ```
         you should see something similar to
         ```sh
-        2021-01-01 09:49:12 Generating grammar tables from /usr/lib/python3.6/lib2to3/Grammar.txt
-        2021-01-01 09:49:12 Generating grammar tables from /usr/lib/python3.6/lib2to3/PatternGrammar.txt
+        2021-01-01 09:49:12 Generating grammar tables from /usr/lib/python3.7/lib2to3/Grammar.txt
+        2021-01-01 09:49:12 Generating grammar tables from /usr/lib/python3.7/lib2to3/PatternGrammar.txt
         [+] Initializing project structure...
 
         Project generated: ./sam-app

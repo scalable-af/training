@@ -11,7 +11,7 @@ custom:
 
 provider:
   name: aws
-  runtime: python3.6
+  runtime: python3.7
   timeout: 300
 
 
@@ -41,7 +41,7 @@ functions:
   Student00GithubWebhookSAM:
     name: github-webhook-${self:custom.uniqueid}
     memorySize: 256
-    runtime: python3.6
+    runtime: python3.7
     handler: github_webhook/webhook.post
     layers:
       - {Ref: Student00AwsCliLambdaLayer}
@@ -57,7 +57,7 @@ functions:
       github_secrets: secret
   Student00CommentsPostSAM:
     name: comment-post-${self:custom.uniqueid}
-    runtime: python3.6
+    runtime: python3.7
     handler: comments/comments.post
     environment:
       table_name: hugo-comments-${self:custom.uniqueid}
@@ -70,13 +70,13 @@ functions:
           method: options
   Student00CommentsGetSAM:
     name: comment-get-${self:custom.uniqueid}
-    runtime: python3.6
+    runtime: python3.7
     handler: comments/comments.get
     environment:
       table_name: hugo-comments-${self:custom.uniqueid}
   Student00DynamoStreamSAM:
     name: dynamo-stream-${self:custom.uniqueid}
-    runtime: python3.6
+    runtime: python3.7
     handler: dynamo_stream/dynamo_stream.fake_webhook
     environment:
       webhook_function: github-webhook-${self:custom.uniqueid}

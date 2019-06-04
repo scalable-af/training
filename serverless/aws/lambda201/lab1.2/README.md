@@ -38,7 +38,7 @@ The AWS Management Console is incredibly useful and we will continue to use it t
 9.  Upload the function using the AWS CLI (replace everything inside of the { } with your own values)
     ```sh
     aws lambda create-function --function-name {FUNCTION_NAME - ex. student00-lab2} \
-    --zip-file fileb://function.zip --handler main.lambda_handler --runtime python3.6 \
+    --zip-file fileb://function.zip --handler main.lambda_handler --runtime python3.7 \
     --role arn:aws:iam::{AWS_ACCOUNT_ID}:role/{EXECUTION_ROLE_FROM_ABOVE}
     ```
     You should get a json formatted output similar to the below
@@ -58,7 +58,7 @@ The AWS Management Console is incredibly useful and we will continue to use it t
         "Timeout": 3, 
         "LastModified": "2019-05-12T12:22:51.690+0000", 
         "Handler": "main.lambda_handler", 
-        "Runtime": "python3.6", 
+        "Runtime": "python3.7", 
         "Description": ""
     }
 
@@ -120,7 +120,7 @@ Now that we have created a Lambda function updating it from the command line is 
     "Timeout": 3, 
     "LastModified": "2019-05-12T12:26:42.346+0000", 
     "Handler": "main.lambda_handler", 
-    "Runtime": "python3.6", 
+    "Runtime": "python3.7", 
     "Description": ""
     }
     ```

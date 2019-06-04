@@ -17,7 +17,7 @@
     - Put in some random numbers and letters for your uniqueid. Serverless doesn't create any unique IDs for it's objects, and it also has the ARN restrictions we discussed so you need to put this in manually.
 2. Run the deployment
     - Run the deployment, everything should be prebuilt.
-        -   If you get an error that it couldn't find python, you need to install python3.6 on your system.
+        -   If you get an error that it couldn't find python, you need to install python3.7 on your system.
     ```bash
     serverless deploy
     ```
