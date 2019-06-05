@@ -33,7 +33,7 @@ Now that we have some functions and applications running in a CloudFormation sta
     [2021-01-01 13:38:17,844][INFO] [{'comment': 'test comment', 'uuid': 'bad5dd9a-77e5-45dc-ad4b-18ebd02932c4', 'page': 'first-post', 'name': 'test name'}, {'comment': 'test comment', 'uuid': 'ce1a4da9-c999-484b-bdbf-b3c76e8b6fae', 'page': 'first-post', 'name': 'test name'}]
 
     ```
-    We have just locally invoked the same comment.get lambda handler that our github-webhook function uses to get comments for injection into the site. Our loca function, using the table name connected to the remote DynamoDB using our credentials.
+    We have just locally invoked the same comment.get lambda handler that our github-webhook function uses to get comments for injection into the site. Our local function, using the table name connected to the remote DynamoDB using our credentials.
 
 2. Start a local API Gateway
     - You can start a local API Gatway with

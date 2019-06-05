@@ -24,7 +24,7 @@
     full_name: {YOUR_REPO_NAME e.g. student00/blog}
     clone_url: {YOUR_HTTPS_CLONE_URL e.g. https://github.com/scalable-af/training.git}
     ```
-    ![Github Secrets](./images/full_clone.jpg "Github Secrets")
+    ![Full clone path](./images/full_clone.jpg "Full clone path")
 
 3. Build the template using containers.
     - In lab 1.4 and 1.5 we had dependencies built into our function. This has some issues, specifically if you make any modifications or add dependencies with different versions of python.
@@ -39,7 +39,8 @@
 4. We need to package it up to s3 again. You can use the same bucket you used in lab 2.1
     - Run the SAM Package command
     ```bash
-    sam package \                                                                                               --output-template-file packaged.yaml \
+    sam package \
+            --output-template-file packaged.yaml \
             --s3-bucket {YOUR_BUCKET}
     ```
 

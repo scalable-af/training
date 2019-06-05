@@ -8,6 +8,8 @@ custom:
   uniqueid: dfasa3a
   clone_url: https://github.com/scalable-af/training.git
   full_name: scalable-af/training
+  pythonRequirements:
+    dockerizePip: true
   alerts:
     alarms:
       - functionThrottles
@@ -17,20 +19,20 @@ provider:
   name: aws
   runtime: python3.7
   timeout: 300
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - cloudwatch:*
+        - events:*
+        - dynamodb:*
+        - lambda:*
+        - logs:*
+        - s3:*
+        - codedeploy:*
+      Resource:
+        - "*"
 
 
-iamRoleStatements:
-  - Effect: "Allow"
-    Action:
-      - cloudwatch:*
-      - events:*
-      - dynamodb:*
-      - lambda:*
-      - logs:*
-      - s3:*
-      - codedeploy:*
-    Resource:
-      - "*"
 layers:
   student00AwsCli:
     package:
