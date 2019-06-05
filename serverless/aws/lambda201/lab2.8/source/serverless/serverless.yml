@@ -2,13 +2,16 @@ service: student00-static-blog-${self:custom.uniqueid} # NOTE: update this with 
 
 plugins:
   - serverless-python-requirements
-  - serverless-offline
   - serverless-plugin-canary-deployments
-
+  - serverless-plugin-aws-alerts
 custom:
-  uniqueid: dfasasfg3a
+  uniqueid: dfasa3a
   clone_url: https://github.com/scalable-af/training.git
   full_name: scalable-af/training
+  alerts:
+    alarms:
+      - functionThrottles
+      - functionErrors
 
 provider:
   name: aws
@@ -76,6 +79,10 @@ functions:
     handler: comments/comments.get
     environment:
       table_name: hugo-comments-${self:custom.uniqueid}
+    events:
+      - http:
+          path: /comments
+          method: get
     alarms:
       - name: GetCommentsError${self:custom.uniqueid}
         namespace: 'AWS/Lambda'
@@ -89,7 +96,7 @@ functions:
       type: Linear10PercentEvery1Minute
       alias: prod
       alarms:
-        - CommentsGet${self:custom.uniqueid}GetCommentsError${self:custom.uniqueid}Alarm
+        - Student00CommentsGetSAMGetCommentsError${self:custom.uniqueid}Alarm
   Student00DynamoStreamSAM:
     name: dynamo-stream-${self:custom.uniqueid}
     runtime: python3.7

@@ -170,18 +170,30 @@ def get(event, context):
         logger.info("Allowing CORS")
         return cors_response({"message": "allowed"}, 200)
     
-    # Here we take a few steps to get the JSON into the event_json object
-    # If this came in as a proxy request, or a direct API Gateway request
-    # or a boto3 invokation the format of the body could be a few different types
-    # With this stepped approach we can gaurantee that no matter how this was caled
-    # we will have JSON in the event_json variable.
-    if "body" in event:
-        event_json=json.loads(event['body'])
-    else:
-        try:
-            event_json=json.loads(event)
-        except:
-            event_json=event
+    logger.info(event['queryStringParameters'])
+    if "httpMethod" in event and event['httpMethod'] == "GET":
+        if "page" in event['queryStringParameters']:
+            try: 
+                event_json=json.loads(event['queryStringParameters'])
+            except:
+                event_json=event['queryStringParameters']
+    else: 
+        # Here we take a few steps to get the JSON into the event_json object
+        # If this came in as a proxy request, or a direct API Gateway request
+        # or a boto3 invokation the format of the body could be a few different types
+        # With this stepped approach we can gaurantee that no matter how this was caled
+        # we will have JSON in the event_json variable.
+        if "body" in event:
+            try:
+                event_json=json.loads(event['body'])
+            except:
+                pass
+        else:
+            try:
+                event_json=json.loads(event)
+            except:
+                event_json=event
+
 
     # Short circuit to save time if we don't have any of the critical data
     try:
@@ -213,7 +225,7 @@ def get(event, context):
     modified_items = []
     for item in items:
         modified_items.append({
-            "name": 'Canary: {}\n'.format(item["name"]),
+            "name": 'Name: {}\n'.format(item["name"]),
             "comment": item["comment"]
         })
 

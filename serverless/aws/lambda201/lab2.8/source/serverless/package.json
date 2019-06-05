@@ -10,5 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "serverless-python-requirements": "^4.3.0"
+  },
+  "devDependencies": {
+    "serverless-plugin-aws-alerts": "^1.2.4",
+    "serverless-plugin-canary-deployments": "^0.4.7"
   }
 }

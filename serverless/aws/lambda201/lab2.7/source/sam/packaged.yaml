@@ -1,0 +1,262 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Hugo Static Site
+Globals:
+  Function:
+    Timeout: 300
+Outputs:
+  HugoBlogComments:
+    Description: API Gateway endpoint URL for Prod stage for Hugo static site github
+      webhook
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/comments/
+  HugoBlogWebhook:
+    Description: API Gateway endpoint URL for Prod stage for Hugo static site github
+      webhook
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/webhook/
+  Student00CommentsGetSAM:
+    Description: CommentsGet Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - Student00CommentsGetSAM
+      - Arn
+  Student00CommentsPostSAM:
+    Description: CommentsPost Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - Student00CommentsPostSAM
+      - Arn
+  Student00GithubWebhookSAM:
+    Description: GithubWebhook Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - Student00GithubWebhookSAM
+      - Arn
+  WebsiteURL:
+    Description: URL for website hosted on S3
+    Value:
+      Fn::GetAtt:
+      - Student00HugoSiteBucket
+      - WebsiteURL
+Resources:
+  AliasErrorMetricGreaterThanZeroAlarm:
+    Properties:
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+      - Name: FunctionName
+        Value:
+          Ref: Student00CommentsGetSAM
+      EvaluationPeriods: 1
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Period: 60
+      Statistic: Sum
+      Threshold: '0'
+    Type: AWS::CloudWatch::Alarm
+  BucketPolicy:
+    Properties:
+      Bucket:
+        Ref: Student00HugoSiteBucket
+      PolicyDocument:
+        Id: PublicHostingPolicy
+        Statement:
+        - Action: s3:GetObject
+          Effect: Allow
+          Principal: '*'
+          Resource:
+            Fn::Join:
+            - ''
+            - - 'arn:aws:s3:::'
+              - Ref: Student00HugoSiteBucket
+              - /*
+          Sid: PublicReadForGetBucketObjects
+        Version: 2012-10-17
+    Type: AWS::S3::BucketPolicy
+  Student00AWSCLILayer:
+    Properties:
+      CompatibleRuntimes:
+      - python3.7
+      ContentUri: s3://student00-sam-deploy/c1cf0184df271d2b3788a6516cf04598
+      Description: AWS CLI Layer
+      LayerName: student00aws-cli-layer
+      LicenseInfo: MIT
+      RetentionPolicy: Retain
+    Type: AWS::Serverless::LayerVersion
+  Student00CommentsGetSAM:
+    Properties:
+      AutoPublishAlias: prod
+      CodeUri: s3://student00-sam-deploy/122b3e98d03eb6c56dc7afbd6013d021
+      DeploymentPreference:
+        Alarms:
+        - Ref: AliasErrorMetricGreaterThanZeroAlarm
+        Type: Linear10PercentEvery1Minute
+      Environment:
+        Variables:
+          table_name:
+            Ref: Student00CommentsSAM
+      Events:
+        CommentsGet:
+          Properties:
+            Method: get
+            Path: /comments
+          Type: Api
+      Handler: comments.get
+      Policies:
+      - Statement:
+        - Action:
+          - cloudwatch:*
+          - events:*
+          - dynamodb:*
+          - lambda:*
+          - logs:*
+          - s3:*
+          - codedeploy:*
+          Effect: Allow
+          Resource: '*'
+      Runtime: python3.7
+    Type: AWS::Serverless::Function
+  Student00CommentsPostSAM:
+    Properties:
+      CodeUri: s3://student00-sam-deploy/122b3e98d03eb6c56dc7afbd6013d021
+      Environment:
+        Variables:
+          table_name:
+            Ref: Student00CommentsSAM
+      Events:
+        CommentsOptions:
+          Properties:
+            Method: options
+            Path: /comments
+          Type: Api
+        CommentsPost:
+          Properties:
+            Method: post
+            Path: /comments
+          Type: Api
+      Handler: comments.post
+      Policies:
+      - Statement:
+        - Action:
+          - cloudwatch:*
+          - events:*
+          - dynamodb:*
+          - lambda:*
+          - logs:*
+          - s3:*
+          - codedeploy:*
+          Effect: Allow
+          Resource: '*'
+      Runtime: python3.7
+    Type: AWS::Serverless::Function
+  Student00CommentsSAM:
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: uuid
+        AttributeType: S
+      KeySchema:
+      - AttributeName: uuid
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+    Type: AWS::DynamoDB::Table
+  Student00DynamoStreamSAM:
+    Properties:
+      CodeUri: s3://student00-sam-deploy/db5dff51b574c3c46e1e0aff9b27a32c
+      Environment:
+        Variables:
+          clone_url: YOUR_HTTPS_CLONE_URL e.g. https://github.com/scalable-af/training.git
+          full_name: YOUR_REPO_NAME e.g. student00/blog
+          webhook_function:
+            Ref: Student00GithubWebhookSAM
+      Events:
+        Stream:
+          Properties:
+            BatchSize: 10
+            StartingPosition: TRIM_HORIZON
+            Stream:
+              Fn::GetAtt:
+              - Student00CommentsSAM
+              - StreamArn
+          Type: DynamoDB
+      Handler: dynamo_stream.fake_webhook
+      Policies:
+      - Statement:
+        - Action:
+          - cloudwatch:*
+          - events:*
+          - dynamodb:*
+          - lambda:*
+          - logs:*
+          - s3:*
+          - codedeploy:*
+          Effect: Allow
+          Resource: '*'
+      Runtime: python3.7
+    Type: AWS::Serverless::Function
+  Student00GithubWebhookSAM:
+    Properties:
+      CodeUri: s3://student00-sam-deploy/f140e5367394cee17b5bea949c5100cb
+      Environment:
+        Variables:
+          comment_function:
+            Ref: Student00CommentsGetSAM
+          github_secrets: secret
+          output_bucket:
+            Ref: Student00HugoSiteBucket
+      Events:
+        WebhookPost:
+          Properties:
+            Method: post
+            Path: /webhook
+          Type: Api
+      Handler: webhook.post
+      Layers:
+      - Ref: Student00AWSCLILayer
+      - Ref: Student00LibCLayer
+      - Ref: Student00HugoLayer
+      MemorySize: 256
+      Policies:
+      - Statement:
+        - Action:
+          - cloudwatch:*
+          - events:*
+          - dynamodb:*
+          - lambda:*
+          - logs:*
+          - s3:*
+          - codedeploy:*
+          Effect: Allow
+          Resource: '*'
+      Runtime: python3.7
+    Type: AWS::Serverless::Function
+  Student00HugoLayer:
+    Properties:
+      CompatibleRuntimes:
+      - python3.7
+      ContentUri: s3://student00-sam-deploy/ae7bed435532ec835c762db5de71ecd3
+      Description: Hugo CLI Layer
+      LayerName: student00hugo-layer
+      LicenseInfo: MIT
+      RetentionPolicy: Retain
+    Type: AWS::Serverless::LayerVersion
+  Student00HugoSiteBucket:
+    DeletionPolicy: Retain
+    Properties:
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+    Type: AWS::S3::Bucket
+  Student00LibCLayer:
+    Properties:
+      CompatibleRuntimes:
+      - python3.7
+      ContentUri: s3://student00-sam-deploy/3dfa5a42a6dfd2682a15a89777c87fe7
+      Description: LIBC Layer
+      LayerName: student00libc-layer
+      LicenseInfo: MIT
+      RetentionPolicy: Retain
+    Type: AWS::Serverless::LayerVersion
+Transform: AWS::Serverless-2016-10-31
