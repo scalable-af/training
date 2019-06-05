@@ -8,6 +8,7 @@ custom:
   uniqueid: dfasasfg3a
   clone_url: https://github.com/scalable-af/training.git
   full_name: scalable-af/training
+  github_secret: secret
   pythonRequirements:
     dockerizePip: true
 
@@ -54,7 +55,7 @@ functions:
     environment:
       output_bucket: hugo-static-site-${self:custom.uniqueid}
       comment_function: comment-get-${self:custom.uniqueid}
-      github_secrets: secret
+      github_secrets: ${self:custom.github_secret}
   Student00CommentsPostSAM:
     name: comment-post-${self:custom.uniqueid}
     runtime: python3.7
