@@ -54,7 +54,7 @@
         ```
     - Our functions need environment variables. Same as above we can pass them in with the -e flag
         ```bash
-        sls offline -e table_name
+        sls offline -e table_name=YOUR_TABLE_NAME 
         ```
     - You should see a message stating it is listening on localhost:3000 now.
     - Send a curl command to post a new comment 
