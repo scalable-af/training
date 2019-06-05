@@ -210,9 +210,17 @@ def get(event, context):
     items = scan_table_allpages(table, "page", page)
     logger.info(items)
 
+    modified_items = []
+    for item in items:
+        modified_items.append({
+            "name": 'Canary: {}\n'.format(item["name"]),
+            "comment": item["comment"]
+        })
+
+
     # If we find any comments return with the appropriate status code
     if items:
-        return cors_response(items, 200)
+        return cors_response(modified_items, 200)
     # If not items are found use the appropriate HTTP code
     # In our local invokation of this in the webhook we aren't using the status
     # code we are counting the items that are returned but if this were being
