@@ -1,0 +1,152 @@
+service: student00-static-blog-${self:custom.uniqueid} # NOTE: update this with your service name
+
+plugins:
+  - serverless-python-requirements
+  - serverless-plugin-canary-deployments
+  - serverless-plugin-aws-alerts
+custom:
+  uniqueid: dfasa3a
+  clone_url: https://github.com/scalable-af/training.git
+  full_name: scalable-af/training
+  alerts:
+    alarms:
+      - functionThrottles
+      - functionErrors
+
+provider:
+  name: aws
+  runtime: python3.7
+  timeout: 300
+
+
+iamRoleStatements:
+  - Effect: "Allow"
+    Action:
+      - cloudwatch:*
+      - events:*
+      - dynamodb:*
+      - lambda:*
+      - logs:*
+      - s3:*
+      - codedeploy:*
+    Resource:
+      - "*"
+layers:
+  student00AwsCli:
+    package:
+      artifact: layers/lambda-layer-awscli-1.16.115.zip
+  student00Libc:
+    package:
+      artifact: layers/lambda-layer-libstdc.zip
+  student00Hugo:
+    package:
+      artifact: layers/lambda-layer-hugo-0.54.zip
+
+functions:
+  Student00GithubWebhookSAM:
+    name: github-webhook-${self:custom.uniqueid}
+    memorySize: 256
+    runtime: python3.7
+    handler: github_webhook/webhook.post
+    layers:
+      - {Ref: Student00AwsCliLambdaLayer}
+      - {Ref: Student00LibcLambdaLayer}
+      - {Ref: Student00HugoLambdaLayer}
+    events:
+      - http:
+          path: /webhook
+          method: post
+    environment:
+      output_bucket: hugo-static-site-${self:custom.uniqueid}
+      comment_function: CommentsGet${self:custom.uniqueid}
+      github_secrets: secret
+  Student00CommentsPostSAM:
+    name: comment-post-${self:custom.uniqueid}
+    runtime: python3.7
+    handler: comments/comments.post
+    environment:
+      table_name: hugo-comments-${self:custom.uniqueid}
+    events:
+      - http:
+          path: /comments
+          method: post
+      - http:
+          path: /comments
+          method: options
+  Student00CommentsGetSAM:
+    name: CommentsGet${self:custom.uniqueid}
+    runtime: python3.7
+    handler: comments/comments.get
+    environment:
+      table_name: hugo-comments-${self:custom.uniqueid}
+    events:
+      - http:
+          path: /comments
+          method: get
+    alarms:
+      - name: GetCommentsError${self:custom.uniqueid}
+        namespace: 'AWS/Lambda'
+        metric: Errors
+        threshold: 0
+        statistic: Minimum
+        period: 60
+        evaluationPeriods: 1
+        comparisonOperator: GreaterThanThreshold
+    deploymentSettings:
+      type: Linear10PercentEvery1Minute
+      alias: prod
+      alarms:
+        - Student00CommentsGetSAMGetCommentsError${self:custom.uniqueid}Alarm
+  Student00DynamoStreamSAM:
+    name: dynamo-stream-${self:custom.uniqueid}
+    runtime: python3.7
+    handler: dynamo_stream/dynamo_stream.fake_webhook
+    environment:
+      webhook_function: github-webhook-${self:custom.uniqueid}
+      full_name: ${self:custom.full_name}
+      clone_url: ${self:custom.clone_url}
+    events:
+      - stream:
+          type: dynamodb
+          batchSize: 10
+          startingPosition: TRIM_HORIZON
+          arn:
+            Fn::GetAtt: [student00CommentsTable, StreamArn]
+
+resources:
+  Resources:
+      student00CommentsTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+          TableName: hugo-comments-${self:custom.uniqueid}
+          AttributeDefinitions:
+            - AttributeName: uuid
+              AttributeType: S
+          KeySchema:
+            - AttributeName: uuid
+              KeyType: HASH
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
+          StreamSpecification:
+            StreamViewType: NEW_IMAGE
+      WebAppS3Bucket:
+        Type: AWS::S3::Bucket
+        Properties:
+          BucketName: hugo-static-site-${self:custom.uniqueid}
+          AccessControl: PublicRead
+          WebsiteConfiguration:
+            IndexDocument: index.html
+      WebAppS3BucketPolicy:
+        Type: AWS::S3::BucketPolicy
+        Properties:
+          Bucket:
+            Ref: WebAppS3Bucket
+          PolicyDocument:
+            Statement:
+              - Sid: PublicReadGetObject
+                Effect: Allow
+                Principal: "*"
+                Action:
+                - s3:GetObject
+                Resource: arn:aws:s3:::hugo-static-site-${self:custom.uniqueid}/*
