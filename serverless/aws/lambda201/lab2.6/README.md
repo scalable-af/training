@@ -9,7 +9,7 @@
 1. To look at logs of functions we have to use the full name. Unfortunately that means we have to know the unique ID we gave to them. We can't select a generic name in a stack like we were able to do with SAM.
     - Tail the logs of our github_webhook and make a change to see it in action
         ```bash
-        serverless logs -f github-webhook-YOURID -t
+        serverless logs -f Student00GithubWebhookSAM -t
         ```
 2. Invoke a function locally, talking to external resources.
     - We can invoke local functions using  
