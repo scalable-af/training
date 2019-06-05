@@ -17,7 +17,7 @@
     - Since we have to define our names in the `serverless.yml` we know what our table is named. Get your table name and unique ID from the serverless.yml or from the management console.
     - Now run
     ```bash
-    echo '{"page": "first-post"}'|sam invoke local -f Student00CommentsGetSAM -e table_name=YOUR_TABLE_NAME 
+    echo '{"page": "first-post"}'|serverless invoke local -f Student00CommentsGetSAM -e table_name=YOUR_TABLE_NAME 
     ```
     You should see something similar to 
     ```bash
