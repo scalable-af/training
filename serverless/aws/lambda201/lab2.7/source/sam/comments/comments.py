@@ -170,7 +170,8 @@ def get(event, context):
         logger.info("Allowing CORS")
         return cors_response({"message": "allowed"}, 200)
     
-    logger.info(event['queryStringParameters'])
+    if "queryStringParameters" in event:
+        logger.info(event['queryStringParameters'])
     if "httpMethod" in event and event['httpMethod'] == "GET":
         if "page" in event['queryStringParameters']:
             try: 
